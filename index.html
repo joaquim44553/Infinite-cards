@@ -1,164 +1,53 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Infinite Cards</title>
+  <meta charset="UTF-8">
+  <title>Mini RPG Simples</title>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, sans-serif;
-      background: #f0f8ff;
-      margin: 0;
-      padding: 0;
-      color: #222;
-    }
-
-    header {
-      text-align: center;
-      background: #4a90e2;
-      color: white;
-      padding: 20px;
-      font-size: 2em;
-    }
-
-    main {
-      max-width: 800px;
-      margin: 30px auto;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    h2 {
-      text-align: center;
-      color: #4a90e2;
-    }
-
-    ol {
-      font-size: 1.1em;
-      line-height: 1.6;
-    }
-
-    .center {
-      text-align: center;
-      margin-top: 30px;
-    }
-
-    #game-container {
-      display: none;
-      text-align: center;
-    }
-
-    .card {
-      display: inline-block;
-      width: 100px;
-      height: 140px;
-      margin: 10px;
-      border: 2px solid #4a90e2;
-      border-radius: 10px;
-      background-color: #e0e0e0;
-      font-size: 1em;
-      line-height: 140px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    .card.revealed {
-      background-color: #fff;
-      color: #4a90e2;
-    }
-
-    button {
-      padding: 10px 20px;
-      margin: 15px;
-      background: #4a90e2;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:hover {
-      opacity: 0.9;
-    }
+    body { margin: 0; background: #222; }
+    canvas { display: block; margin: auto; background: #6bbf59; }
   </style>
 </head>
 <body>
-  <header>Infinite Cards</header>
-  <main>
-    <section id="tutorial">
-      <h2>Como Jogar</h2>
-      <ol>
-        <li>Toque em "Começar a Jogar" para ver 3 cartas viradas.</li>
-        <li>Clique em uma carta para revelá-la.</li>
-        <li>Descubra quais cartas raras você tirou!</li>
-      </ol>
-      <div class="center">
-        <button id="btn-start">Começar a Jogar</button>
-      </div>
-    </section>
+<canvas id="game" width="400" height="300"></canvas>
+<script>
+  const canvas = document.getElementById("game");
+  const ctx = canvas.getContext("2d");
 
-    <section id="game-container">
-      <h2>Cartas Misteriosas</h2>
-      <div id="game"></div>
-      <div class="center">
-        <button id="btn-back">Voltar ao Tutorial</button>
-        <button id="btn-restart">Sortear Novamente</button>
-      </div>
-    </section>
-  </main>
+  const player = {
+    x: 200,
+    y: 150,
+    size: 20,
+    color: "blue",
+    speed: 2
+  };
 
-  <script>
-    const btnStart = document.getElementById("btn-start");
-    const btnBack = document.getElementById("btn-back");
-    const btnRestart = document.getElementById("btn-restart");
-    const tutorial = document.getElementById("tutorial");
-    const gameContainer = document.getElementById("game-container");
-    const gameDiv = document.getElementById("game");
+  const keys = {};
+  document.addEventListener("keydown", e => keys[e.key] = true);
+  document.addEventListener("keyup", e => keys[e.key] = false);
 
-    const cartas = ["Fogo", "Gelo", "Trovão", "Cura", "Veneno", "Dragão", "Espada", "Escudo"];
+  function update() {
+    if (keys["ArrowUp"]) player.y -= player.speed;
+    if (keys["ArrowDown"]) player.y += player.speed;
+    if (keys["ArrowLeft"]) player.x -= player.speed;
+    if (keys["ArrowRight"]) player.x += player.speed;
+  }
 
-    function embaralharCartas() {
-      let sorteadas = [];
-      while (sorteadas.length < 3) {
-        let carta = cartas[Math.floor(Math.random() * cartas.length)];
-        if (!sorteadas.includes(carta)) {
-          sorteadas.push(carta);
-        }
-      }
-      return sorteadas;
-    }
+  function draw() {
+    ctx.fillStyle = "#6bbf59";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    function mostrarCartas() {
-      const selecionadas = embaralharCartas();
-      gameDiv.innerHTML = "";
-      selecionadas.forEach((cartaTexto, i) => {
-        const carta = document.createElement("div");
-        carta.className = "card";
-        carta.textContent = "???";
-        carta.addEventListener("click", () => {
-          carta.textContent = cartaTexto;
-          carta.classList.add("revealed");
-        });
-        gameDiv.appendChild(carta);
-      });
-    }
+    ctx.fillStyle = player.color;
+    ctx.fillRect(player.x, player.y, player.size, player.size);
+  }
 
-    btnStart.onclick = () => {
-      tutorial.style.display = "none";
-      gameContainer.style.display = "block";
-      mostrarCartas();
-    };
+  function loop() {
+    update();
+    draw();
+    requestAnimationFrame(loop);
+  }
 
-    btnBack.onclick = () => {
-      gameContainer.style.display = "none";
-      tutorial.style.display = "block";
-    };
-
-    btnRestart.onclick = mostrarCartas;
-  </script>
+  loop();
+</script>
 </body>
 </html>
