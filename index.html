@@ -41,7 +41,6 @@
       margin-top: 40px;
       text-align: center;
     }
-    /* Exemplo: área do jogo */
     #game {
       width: 320px;
       height: 480px;
@@ -49,7 +48,6 @@
       border: 2px solid #4a90e2;
       border-radius: 8px;
       background: #fff;
-      /* Aqui vai o canvas ou elementos do jogo */
       display: flex;
       align-items: center;
       justify-content: center;
@@ -105,21 +103,14 @@
     btnStart.addEventListener('click', () => {
       tutorial.style.display = 'none';
       gameContainer.style.display = 'block';
-
-      // Aqui você pode iniciar seu jogo, carregar scripts, etc.
-      // Por exemplo, limpar texto inicial:
       gameDiv.textContent = 'Carregando o jogo...';
-
-      // Depois de carregar seu jogo, substitua o conteúdo acima pelo seu jogo real.
     });
 
     btnBack.addEventListener('click', () => {
       gameContainer.style.display = 'none';
       tutorial.style.display = 'block';
-
-      // Pausar ou resetar o jogo aqui, se quiser.
       gameDiv.textContent = 'Seu jogo vai aparecer aqui!';
     });
   </script>
 </body>
-  </html>
+</html>
