@@ -6,56 +6,83 @@
   <title>Infinite Cards</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
       background: #f0f8ff;
       margin: 0;
-      padding: 0 20px;
+      padding: 0;
       color: #222;
     }
+
     header {
       text-align: center;
       background: #4a90e2;
       color: white;
-      padding: 20px 0;
-      font-size: 2.5em;
-      font-weight: bold;
-      letter-spacing: 2px;
+      padding: 20px;
+      font-size: 2em;
     }
+
     main {
-      max-width: 900px;
+      max-width: 800px;
       margin: 30px auto;
       background: white;
-      border-radius: 8px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-      padding: 20px 30px;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
+
     h2 {
+      text-align: center;
       color: #4a90e2;
-      text-align: center;
     }
+
     ol {
-      line-height: 1.8;
       font-size: 1.1em;
+      line-height: 1.6;
     }
+
+    .center {
+      text-align: center;
+      margin-top: 30px;
+    }
+
     #game-container {
-      margin-top: 40px;
+      display: none;
       text-align: center;
     }
-    #game {
-      width: 320px;
-      height: 480px;
-      margin: 0 auto;
+
+    .card {
+      display: inline-block;
+      width: 100px;
+      height: 140px;
+      margin: 10px;
       border: 2px solid #4a90e2;
-      border-radius: 8px;
-      background: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2em;
-      color: #444;
-    }
-    button {
+      border-radius: 10px;
+      background-color: #e0e0e0;
+      font-size: 1em;
+      line-height: 140px;
+      font-weight: bold;
       cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .card.revealed {
+      background-color: #fff;
+      color: #4a90e2;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 15px;
+      background: #4a90e2;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
     }
   </style>
 </head>
@@ -65,52 +92,73 @@
     <section id="tutorial">
       <h2>Como Jogar</h2>
       <ol>
-        <li><strong>Crie seu personagem:</strong> Escolha o nome, sexo e a classe que prefere (arqueiro, guerreiro, mago, etc.).</li>
-        <li><strong>Explore o mundo:</strong> Aventurar-se pela floresta em um cenário pixel art 2D cheio de inimigos e chefes.</li>
-        <li><strong>Colete cartas:</strong> Durante as batalhas, ganhe cartas com poderes especiais para usar contra os inimigos.</li>
-        <li><strong>Evolua seu personagem:</strong> Ganhe experiência (XP) ao derrotar inimigos para subir de nível e melhorar suas habilidades.</li>
-        <li><strong>Desafie bosses:</strong> Enfrente chefes poderosos que podem dropar cartas raras e valiosas.</li>
+        <li>Toque em "Começar a Jogar" para ver 3 cartas viradas.</li>
+        <li>Clique em uma carta para revelá-la.</li>
+        <li>Descubra quais cartas raras você tirou!</li>
       </ol>
-      <p style="text-align:center; margin-top: 30px;">
-        <button id="btn-start" style="
-          background:#4a90e2; color:#fff; padding:12px 25px;
-          border:none; border-radius:6px; font-weight:bold;
-        ">Começar a Jogar</button>
-      </p>
+      <div class="center">
+        <button id="btn-start">Começar a Jogar</button>
+      </div>
     </section>
 
-    <section id="game-container" style="display:none;">
-      <h2>Jogo Infinite Cards</h2>
-      <div id="game">
-        Seu jogo vai aparecer aqui!
+    <section id="game-container">
+      <h2>Cartas Misteriosas</h2>
+      <div id="game"></div>
+      <div class="center">
+        <button id="btn-back">Voltar ao Tutorial</button>
+        <button id="btn-restart">Sortear Novamente</button>
       </div>
-      <p style="text-align:center; margin-top: 20px;">
-        <button id="btn-back" style="
-          background:#ccc; color:#222; padding:10px 20px;
-          border:none; border-radius:6px; font-weight:bold;
-        ">Voltar ao Tutorial</button>
-      </p>
     </section>
   </main>
 
   <script>
-    const btnStart = document.getElementById('btn-start');
-    const btnBack = document.getElementById('btn-back');
-    const tutorial = document.getElementById('tutorial');
-    const gameContainer = document.getElementById('game-container');
-    const gameDiv = document.getElementById('game');
+    const btnStart = document.getElementById("btn-start");
+    const btnBack = document.getElementById("btn-back");
+    const btnRestart = document.getElementById("btn-restart");
+    const tutorial = document.getElementById("tutorial");
+    const gameContainer = document.getElementById("game-container");
+    const gameDiv = document.getElementById("game");
 
-    btnStart.addEventListener('click', () => {
-      tutorial.style.display = 'none';
-      gameContainer.style.display = 'block';
-      gameDiv.textContent = 'Carregando o jogo...';
-    });
+    const cartas = ["Fogo", "Gelo", "Trovão", "Cura", "Veneno", "Dragão", "Espada", "Escudo"];
 
-    btnBack.addEventListener('click', () => {
-      gameContainer.style.display = 'none';
-      tutorial.style.display = 'block';
-      gameDiv.textContent = 'Seu jogo vai aparecer aqui!';
-    });
+    function embaralharCartas() {
+      let sorteadas = [];
+      while (sorteadas.length < 3) {
+        let carta = cartas[Math.floor(Math.random() * cartas.length)];
+        if (!sorteadas.includes(carta)) {
+          sorteadas.push(carta);
+        }
+      }
+      return sorteadas;
+    }
+
+    function mostrarCartas() {
+      const selecionadas = embaralharCartas();
+      gameDiv.innerHTML = "";
+      selecionadas.forEach((cartaTexto, i) => {
+        const carta = document.createElement("div");
+        carta.className = "card";
+        carta.textContent = "???";
+        carta.addEventListener("click", () => {
+          carta.textContent = cartaTexto;
+          carta.classList.add("revealed");
+        });
+        gameDiv.appendChild(carta);
+      });
+    }
+
+    btnStart.onclick = () => {
+      tutorial.style.display = "none";
+      gameContainer.style.display = "block";
+      mostrarCartas();
+    };
+
+    btnBack.onclick = () => {
+      gameContainer.style.display = "none";
+      tutorial.style.display = "block";
+    };
+
+    btnRestart.onclick = mostrarCartas;
   </script>
 </body>
 </html>
